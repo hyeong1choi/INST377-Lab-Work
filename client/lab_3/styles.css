@@ -109,7 +109,7 @@
 .footer-three {
   background-color: #5995DA;
   flex: initial;
-  width: 325px;
+  width: 300px;
 }
 
 .signup {
@@ -118,4 +118,12 @@
 
   .wrapper {
     font-family: ‘Segoe UI’, Candara, ‘Bitstream Vera Sans’, ‘DejaVu Sans’, ‘Bitsream Vera Sans’, ‘Trebuchet MS’, Verdana, ‘Verdana Ref’, sans-serif;
+  }
+
+  .linkwhite {
+    color: white;
+  }
+
+  .linkblue {
+    color: #5995DA;
   }
