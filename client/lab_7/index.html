@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hyeong Choi Lab 7</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+  crossorigin=""/> 
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+  crossorigin=""></script>
+
+</head>
+<body>
+    <div class="side">
+  <form class="search-form">
+    <h2>Hyeong Choi's Lab 7</h2>
+    <p><div class="up">Zip code Food Search</div></p>
+    <p><strong>Search</strong></p>
+    <input type="text" class="search" placeholder="Enter Zipcode">
+    <ul class="suggestions" type='text'>
+    </ul>
+  </form>
+  &nbsp; &nbsp;
+  <div id="mapid"></div>
+</div>
+<script>
+
+async function windowActions(event) {
+
+const endpoint = 'https://data.princegeorgescountymd.gov/resource/umjn-t2iz.json';
+const request = await fetch(endpoint)
+const cities = await request.json()
+console.table(cities);
+console.log(cities);
+
+
+  function findMatches(wordToMatch, cities) {
+  return cities.filter(place => {
+    // here we need to figure out if the city or state matches what was searched
+    const regex = new RegExp(wordToMatch, 'gi');
+    return place.zip.match(regex)
+  });
+}
+
+function displayMatches(event) {
+  const matchArray = findMatches(event.target.value, cities).slice(0,5);
+  const html = matchArray.map(place => {
+    const regex = new RegExp(event.target.value, 'gi');
+    const cityName = place.name.replace(regex, `<span class="hl">${event.target.value}</span>`);
+    const addyName = place.address_line_1.replace(regex, `<span class="hl">${event.target.value}</span>`);
+    const point = place.geocoded_column_1;
+    const latLong = point.coordinates.slice(0,5);
+    const marker = latLong.reverse();
+    const limitedList = matchArray;
+    L.marker(marker).addTo(mymap);
+    return `
+      <a>
+        <span class="name"><p><strong><font size="2"><cap>${cityName}</cap></font></strong><br><em> <font size="1"> ${addyName}</font></em><br></p></cap></span><br>
+      </a>
+    `;
+  }).join('');
+  suggestions.innerHTML = html;
+}
+
+
+const searchInput = document.querySelector('.search');
+const suggestions = document.querySelector('.suggestions');
+
+searchInput.addEventListener('change', displayMatches);
+searchInput.addEventListener('keyup', async (event) =>  {displayMatches(event)});
+}
+var mymap = L.map('mapid').setView([38.9940, -76.9105], 13);
+    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 18,
+    id: 'mapbox/streets-v11',
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken: 'pk.eyJ1IjoiYWlkZW4xY2hvaSIsImEiOiJja3V2cHNrdWMwenNlMm5tcHk2YmplbjA4In0.ARTRm3Wvzn0JfLzZ-zZ3NQ'
+}).addTo(mymap);
+window.onload = windowActions;
+</script>
+  </body>
+</html>
